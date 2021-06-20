@@ -18,7 +18,6 @@ export class LocationService {
 
     async getOpenCageCoordinates(address: string) {
         const query = `?key=${env.OPENCAGE_APP_ID}&q=${address}`;
-        //console.log('url', `${env.OPENCAGE_URL}json${query}`);
         return await fetchGet(`${env.OPENCAGE_URL}json${query}`, {});
     }
 
@@ -35,8 +34,9 @@ export class LocationService {
     async addNewLocation(user_id: string, lat: number, lon: number, address?: string) {
         if (address) {
             const coordinates = await this.getOpenCageCoordinates(address);
-            lat = parseFloat((coordinates.results[0].annotations.DMS.lat).split(' ')[2]);
-            lon = parseFloat((coordinates.results[0].annotations.DMS.lng).split(' ')[2]);
+            const dms = coordinates.results[0].annotations.DMS;
+            lat = parseFloat(dms.lat.split(' ')[2]);
+            lon = parseFloat(dms.lng.split(' ')[2]);
         }
         let location = await this.getOnWaterLocation(lat, lon);
         const current_location = await this.saveLocation(user_id, location);
@@ -44,13 +44,13 @@ export class LocationService {
         const land_locations: ILocation[] = user_locations.filter(l => !l.water);
         const percent_land = (user_locations.length / land_locations.length) || 0;
         return {
-            current_location,
-            last_location: this.calcCrow(user_locations[1].lat, user_locations[1].lon, lat, lon),
-            percent_land: percent_land + '%'
+            water: current_location.water,
+            last_location: `${this.calcCrow(user_locations[1].lat, user_locations[1].lon, lat, lon).toFixed(2)} km`,
+            percent_land: `${percent_land.toFixed(2)}%`
         }
     }
 
-    calcCrow(lat1: number, lon1: number, lat2: number, lon2: number) {
+    private calcCrow(lat1: number, lon1: number, lat2: number, lon2: number): number {
         const R = 6371; // Radius of the earth in km.
         const dLat = this.toRad(lat2-lat1);
         const dLon = this.toRad(lon2-lon1);
@@ -58,13 +58,12 @@ export class LocationService {
         const _lat2 = this.toRad(lat2);
 
         var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(_lat1) * Math.cos(_lat2); 
-        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-        var d = R * c;
-        return d;
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
     }
 
     // Converts numeric degrees to radians
-    private toRad(value: number) 
+    private toRad(value: number): number 
     {
         return value * Math.PI / 180;
     }

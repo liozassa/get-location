@@ -11,7 +11,7 @@ export class LocationRepository {
         } 
     }
 
-    async saveLocation(user_id: string, date: number, data: ILocation) {
+    async saveLocation(user_id: string, date: number, data: ILocation): Promise<ILocation> {
         try {
             const location = new Location({
                 user_id,

@@ -1,5 +1,4 @@
 import { Request, Response, Router } from 'express';
-import { ILocation } from '../models/location.model';
 import { LocationService } from '../services/location.service';
 
 export class LocationController {
@@ -22,16 +21,18 @@ export class LocationController {
                 const lat = typeof(req.query.lat) === 'string' ? parseInt(req.query.lat) : 0;
                 const lon = typeof(req.query.lon) === 'string' ? parseInt(req.query.lon) : 0;
                 const user_id = typeof(req.query.user_id) === 'string' ? req.query.user_id : undefined;
+                
                 if ((!address && (lat === 0 || lon === 0)) || !user_id) {
                     return res.status(401).json({
                         message: "Invalid params"
                     });
                 }
+
                 this.locationService.addNewLocation(user_id, lat, lon, address)
                 .then((result) => {
                     res.status(200).json({
                         message: "Get location successfully!",
-                        location: result
+                        data: result
                     });
                 })
                 .catch(error => {
@@ -39,8 +40,8 @@ export class LocationController {
                 });
             } catch (error) {
                 res.status(401).json({
-                    message: "Account status create failed!",
-                    location: null
+                    message: "Get location failed!",
+                    data: null
                 });
             }
         });
