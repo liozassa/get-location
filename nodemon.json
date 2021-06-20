@@ -1,0 +1,12 @@
+{
+  "env": {
+    "SERVICE_NAME": "Castor Service",
+    "MONGO_ATLAS_PW": "dPY0xIBrxk9Ct7o8",
+    "DB_NAME": "castor",
+    "ONWATER_URL": "https://api.onwater.io/api/v1/",
+    "ONWATER_APP_ID": "oYpLaUdsksGbJwMV7o26",
+    "OPENCAGE_URL": "https://api.opencagedata.com/geocode/v1/",
+    "OPENCAGE_APP_ID": "64d0306977a04537ad60b40740a88494",
+    "PORT": "8080"
+  }
+}
